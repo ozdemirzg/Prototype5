@@ -1,0 +1,148 @@
+Create object list in Game Manager:
+
+Create a new “Game Manager” Empty object, attach a new GameManager.cs script
+--
+Create a coroutine to spawn objects:
+
+in GameManager script
+Declare and initialize a new private float spawnRate variable
+Create a new IEnumerator SpawnTarget () method 
+Inside the new method, while(true), wait 1 second, generate a random index,  and spawn a random target
+In Start(), use the StartCoroutine method to begin spawning objects
+--
+Destroy target with click and sensor:
+In Target.cs, add a new method for private void OnMouseDown() { } , and inside that method, destroy the gameObject
+Add a new method for private void OnTriggerEnter(Collider other) and inside that function, destroy the gameObject
+-----
+Lesson 5.2 - Keeping Score
+
+Add Score text position it on screen:
+n the Hierarchy, Create > UI > TextMeshPro text, then if prompted click the button to Import TMP Essentials 
+Rename the new object “Score Text”, then zoom out to see the canvas in Scene view
+Change the Anchor Point so that it is anchored from the top-left corner
+In the inspector, change its Pos X and Pos Y so that it is in the top-left corner
+--
+Edit the Score Text’s properties:
+Change its text to “Score:”
+Choose a Font Asset, Style, Size, and Vertex color to look good with your background
+--
+Initialize score text and variable:
+At the top of GameManager.cs, add “using TMPro;”
+Declare a new public TextMeshProUGUI scoreText, then assign that variable in the inspector 
+Create a new private int score variable and initialize it in Start() as score = 0;
+Also in Start(), set scoreText.text = "Score: " + score;
+--
+Create a new UpdateScore method:
+in game manager,
+Create a new private void UpdateScore method that requires one int scoreToAdd parameter
+Cut and paste scoreText.text = "Score: " + score; into the new method, then call UpdateScore(0) in Start()
+In UpdateScore(), increment the score by adding
+score += scoreToAdd; 
+Call UpdateScore(5) in the spawnTarget() function
+--
+Add score when targets are destroyed:
+In GameManager.cs, make the UpdateScore method public
+In Target.cs, create a reference to private GameManager gameManager; 
+Initialize GameManager in Start()  using the Find() method
+When a target is destroyed, call UpdateScore(5);, then delete the method call from SpawnTarget()
+--
+Assign a point value to each target:
+In Target.cs, create a new public int pointValue variable
+In each of the Target prefab’s inspectors, set the Point Value to whatever they’re worth, including the bad target’s negative value
+Add the new variable to UpdateScore(pointValue);
+--
+Add a Particle explosion:parçacýk patlamasý ekle:
+In Target.cs, add a new public ParticleSystem explosionParticle variable 
+For each of your target prefabs, assign a particle prefab from Course Library > Particles to the Explosion Particle variable
+In the OnMouseDown() function, instantiate a new explosion prefab
+-----
+Lesson 5.3 - Game Over
+
+Create a Game Over text object:
+ight-click on the Canvas, create a new UI > TextMeshPro - Text object, and rename it “Game Over Text”
+In the inspector, edit its Text, Pos X, Pos Y, Font Asset, Size, Style, Color, and Alignment
+Set the “Wrapping” setting to “Disabled”
+--
+Make GameOver text appear:
+In GameManager.cs, create a new public TextMeshProUGUI gameOverText; and assign the Game Over object to it in the inspector
+Uncheck the Active checkbox to deactivate the Game Over text by default
+In Start(), activate the Game Over text
+--
+Create GameOver function:
+Create a new public void GameOver() function, and move the code that activates the game over text inside it
+In Target.cs, call gameManager.GameOver() if a target collides with the sensor
+Add a new “Bad” tag to the Bad object, add a condition that will only trigger game over if it’s not a bad object
+--
+Stop spawning and score on GameOver:
+in game manager,
+Create a new public bool isGameActive;
+As the first line In Start(), set isGameActive = true; and in GameOver(), set isGameActive = false;
+To prevent spawning, in the SpawnTarget() coroutine, change while (true) to while (isGameActive)
+To prevent scoring, in Target.cs, in the OnMouseDown() function, add the condition if (gameManager.isGameActive) {
+--
+Add a Restart button:
+Right-click on the Canvas and Create > UI > Button
+Note: You could also use Button - TextMeshPro for more control over the button’s text.
+Rename the button “Restart Button”
+Temporarily reactivate the Game Over text in order to reposition the Restart Button nicely with the text, then deactivate it again 
+Select the Text child object, then edit its Text to say “Restart”, its Font, Style, and Size
+--
+Make the restart button work:
+In GameManager.cs, add using UnityEngine.SceneManagement;
+Create a new public void RestartGame() function that reloads the current scene
+In the Button’s inspector, click + to add a new On Click event, drag it in the Game Manager object and select the GameManager.RestartGame function
+--
+Show restart button on game over:
+At the top of GameManager.cs add using UnityEngine.UI;
+Declare a new public Button restartButton; and assign the Restart Button to it in the inspector
+Uncheck the “Active” checkbox for the Restart Button in the inspector
+In the GameOver function, activate the Restart Button
+-------
+Lesson 5.4 - What’s the Difficulty?
+
+Create Title text and menu buttons:
+Duplicate your Game Over text to create your Title Text, editing its name, text and all of its attributes
+Duplicate your Restart Button and edit its attributes to create an “Easy Button” button
+Edit and duplicate the new Easy button to create a“Medium Button” and a “Hard Button”
+--
+Add a DifficultyButton script:
+For all 3 new buttons, in the Button component, in the On Click () section, click the minus (-) button to remove the RestartGame functionality
+Create a new DifficultyButton.cs script and attach it to all 3 buttons
+Add  using UnityEngine.UI to your imports
+Create a new private Button button; variable and initialize it in Start() 
+--
+Call SetDifficulty on button click:
+Create a new void SetDifficulty function, and inside it, Debug.Log(gameObject.name + " was clicked");
+Add the button listener to call the SetDifficulty function
+--
+Make your buttons start the game:
+In GameManager.cs, create a new public void StartGame() function and move everything from Start() into it
+In DifficultyButton.cs, create a new private GameManager gameManager; and initialize it in Start() 
+In the SetDifficulty() function, call gameManager.StartGame();
+--
+Deactivate Title Screen on StartGame:
+Right-click on the Canvas and Create > Empty Object, rename it “Title Screen”, and drag the 3 buttons and title onto it
+In GameManager.cs, create a new public GameObject titleScreen; and assign it in the inspector
+In StartGame(), deactivate the title screen object
+--
+Use a parameter to change difficulty:
+In DifficultyButton.cs, create a new public int difficulty variable, then in the Inspector, assign the Easy difficulty as 1, Medium as 2, and Hard as 3
+Add an int difficulty parameter to the StartGame() function
+In StartGame(), set spawnRate /= difficulty;
+Fix the error in DifficultyButton.cs by passing the difficulty parameter to StartGame(difficulty)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
